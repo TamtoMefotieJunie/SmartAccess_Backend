@@ -1,0 +1,112 @@
+
+const userService = require('../services/user.service');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { listenerCount } = require('../models/hospital.model');
+const Role = require('../models/role.model')
+
+const registerUser = async (req, res) => {
+    
+        const { name, email, password, gender,telephone,role} = req.body;
+        if (req.body.email) {
+            const isUserFound = await userService.getUserByEmail(req.body.email)
+            if (isUserFound) return res.status(400).json({ message: "Sorry user with this email exist already" })
+        }
+        try {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const citizenRole = await Role.findOne({ name: 'Citizen' });
+            const User = {
+                name:name,
+                email:email,
+                password: hashedPassword,
+                gender:gender,
+                telephone:telephone,
+                role:role
+            };
+            const user = await userService.registerUser(User);
+            res.status(201).json({data:user, message: 'User registered successfully' });
+        } catch (error) {
+            console.log("error:",error.message)
+            res.status(500).json({ error: 'Registration failed' });
+        }    
+};
+const getAllUsers=async(req,res)=>{
+    try{
+        
+        const users = await userService.getAllUsers({});
+
+        return res.status(200).json({data: users, message: 'Users fetched successfully !!!'})
+
+    }catch(err){
+        return res.status(500).json('An error occured while fetching users')
+    }
+}
+const getUserByRole = async(req,res) =>{
+    console.log("hokop")
+    const {role} = req.params
+    try{
+        const users =  await userService.getUserByRole(role);
+        console.log("Fetched users:", users); // Log the fetched users
+        return res.status(200).json({message:"users fetched successfully",data:users})
+    }catch(error){
+            return res.status(500).json({message:'An error occured while fetching users',error:error})
+    }
+}
+const getUserById = async (req, res) => {
+    try {
+        const user = await userService.getUserById(req.params?.id); 
+    
+        if (!user) {
+            return res.status(404).json({ data: null, message: 'User not found' });
+        }
+        return res.status(200).json({ data: user, message: 'User fetched successfully!' });
+    } catch (err) {
+        console.error(err); 
+        return res.status(500).json({ data: null, message: 'An error occurred while fetching user' });
+    }
+};
+const getUserByEmail=async(req,res)=>{
+    try{
+        
+        const user = await userService.getUserByEmail(req.params?.email);
+        if(!user){
+        return res.status(404).json({data: user, message: 'user not found!!!'})
+        }
+        return res.status(200).json({data: user, message: 'user fetched successfully !!!'})
+
+    }catch(err){
+        return res.status(500).json('An error occured while fetching user')
+    }
+}
+
+const updateUser = async (req, res) => {
+    try {
+      let user = await userService.updateUser(req.params.id, req.body);
+      if (user !== null) {
+        user = await userService.getUserById(req.params.id)
+      }
+      res.json({ data: user, status: "success" }).status(200);
+    } catch (err) {
+      res.status(500).json({ error : err.message });
+    }
+  };
+
+  const deleteUSer = async (req,res) => {
+    try {
+        const user = await userService.deleteUSer(req.params?.id);
+        res.status(200).json("user deleted successfully");
+        
+    } catch (error) {
+        res.status(500).json({error : error.message})
+    }
+  };
+
+module.exports = {
+    registerUser,
+    updateUser,
+    getAllUsers,
+    getUserById,
+    getUserByEmail,
+    deleteUSer,
+    getUserByRole
+};
