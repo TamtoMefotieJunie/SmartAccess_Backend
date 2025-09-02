@@ -20,6 +20,15 @@ const hospitalSpecialtyOfferingSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
+     specialists: [{
+        type: String,
+        required: false,
+    }],
+    doctors_count_for_service: { 
+        type: Number,
+        min: 0,
+        default: 0,
+    },
 
    doctors_count_for_service: { 
         type: Number,
@@ -30,7 +39,10 @@ const hospitalSpecialtyOfferingSchema = new mongoose.Schema({
         type: String,
         enum: ['Active', 'Inactive', 'Limited Capacity'],
         default: 'Active',
-    }
+    },
+    availability_time:{
+        type:String
+    },
 
 }, {
     timestamps: true,

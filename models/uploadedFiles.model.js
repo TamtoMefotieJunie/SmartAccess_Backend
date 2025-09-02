@@ -1,14 +1,15 @@
-
 const mongoose = require('mongoose');
 
 const fileSchema = new mongoose.Schema({
-    provider:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User',
+    provider: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
     },
-    filename:String,
+    filename: String,
     dataType: String,
     region: String,
+    cloudinaryPublicId: String,
+    cloudinaryUrl: String,    
     uploadedAt: { type: Date, default: Date.now }
 });
 

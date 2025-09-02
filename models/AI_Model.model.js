@@ -11,6 +11,7 @@ const AIModelSchema = mongoose.Schema(
         },
         purpose:String,
         endpoint:String,
+        
     },
     {
         timestamps:true,

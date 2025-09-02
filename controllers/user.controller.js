@@ -46,7 +46,7 @@ const getUserByRole = async(req,res) =>{
     const {role} = req.params
     try{
         const users =  await userService.getUserByRole(role);
-        console.log("Fetched users:", users); // Log the fetched users
+        console.log("Fetched users:", users); 
         return res.status(200).json({message:"users fetched successfully",data:users})
     }catch(error){
             return res.status(500).json({message:'An error occured while fetching users',error:error})
