@@ -5,11 +5,9 @@ const hospitalSchema = new mongoose.Schema({
     address: String,
     city: {
         type: String,
-        required: true,
     },
     region: {
         type: String, 
-        required: true,
     },
     longitude: Number,
     latitude: Number,
@@ -18,12 +16,10 @@ const hospitalSchema = new mongoose.Schema({
     hospital_type: {
         type: String,
         enum: ['Public', 'Private', 'Missionary', 'Military'], 
-        required: true,
     },
     hospital_level: {
         type: String,
         enum: ['Primary Health Center', 'District Hospital', 'Regional Hospital', 'National Referral Hospital', 'Specialized Clinic'], 
-        required: true,
     },
    
     total_bed_capacity: {

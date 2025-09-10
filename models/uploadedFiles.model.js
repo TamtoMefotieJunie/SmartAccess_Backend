@@ -10,6 +10,7 @@ const fileSchema = new mongoose.Schema({
     region: String,
     cloudinaryPublicId: String,
     cloudinaryUrl: String,    
+    file_category:String,
     uploadedAt: { type: Date, default: Date.now }
 });
 

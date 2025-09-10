@@ -27,17 +27,10 @@ const createHospital = async (req, res) => {
         const hospitalData = {
             name: hospital.name || hospital.hospitalName,
             address: hospital.address || hospital.hospitalAddress,
-            city: hospital.city,
             region: hospital.region,
             longitude: hospital.longitude,
             latitude: hospital.latitude,
             telephone_general: hospital.telephone_general,
-            telephone_emergency: hospital.telephone_emergency,
-            hospital_type: hospital.hospital_type,
-            hospital_level: hospital.hospital_level,
-            total_bed_capacity: hospital.total_bed_capacity,
-            staff_count_doctors: hospital.staff_count_doctors || 0,
-            staff_count_specialists: hospital.staff_count_specialists || 0,
             admin: savedAdmin._id 
         };
 

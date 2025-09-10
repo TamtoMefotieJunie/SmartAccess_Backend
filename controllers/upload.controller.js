@@ -2,9 +2,7 @@ const UploadService = require('../services/upload.service');
 const File = require('../models/uploadedFiles.model'); 
 
 class UploadController {
-  /**
-   * Handle single file upload
-   */
+  
   static async uploadFile(req, res, next) {
     try {
       const validation = UploadService.validateFile(req.file);
@@ -25,12 +23,12 @@ class UploadController {
 
       const uploadResult = await UploadService.uploadFile(req.file, uploadOptions);
 
-      // Save uploaded file info to MongoDB
       const savedFile = await File.create({
         provider: req.user ? req.user._id : req.body.provider || null, 
         filename: uploadResult.original_filename || req.file.originalname,
         dataType: uploadResult.mimetype || req.file.mimetype,
         region: req.body.region || 'default',
+        file_category:req.body.file_category,
         cloudinaryPublicId: uploadResult.public_id,
         cloudinaryUrl: uploadResult.secure_url,
         uploadedAt: new Date()
@@ -56,9 +54,7 @@ class UploadController {
     }
   }
 
-  /**
-   * Handle multiple file upload
-   */
+  
   static async uploadMultipleFiles(req, res, next) {
     try {
       if (!req.files || req.files.length === 0) {
@@ -81,7 +77,6 @@ class UploadController {
 
           const uploadResult = await UploadService.uploadFile(file);
 
-          // Save uploaded file info to MongoDB
           const savedFile = await File.create({
             provider: req.user ? req.user._id : null,
             filename: uploadResult.original_filename || file.originalname,
@@ -127,9 +122,7 @@ class UploadController {
     }
   }
 
-  /**
-   * Handle file deletion
-   */
+  
   static async deleteFile(req, res, next) {
     try {
       const { publicId } = req.params;
@@ -143,7 +136,6 @@ class UploadController {
 
       const deleteResult = await UploadService.deleteFile(publicId);
 
-      // Optionally remove from MongoDB
       await File.findOneAndDelete({ cloudinaryPublicId: publicId });
 
       res.status(200).json({
@@ -158,9 +150,7 @@ class UploadController {
     }
   }
 
-  /**
-   * Handle get file details
-   */
+ 
   static async getFileDetails(req, res, next) {
     try {
       const { publicId } = req.params;
@@ -186,9 +176,7 @@ class UploadController {
     }
   }
 
-  /**
-   * Proxy file access for better content-type handling
-   */
+
   static async proxyFile(req, res, next) {
     try {
       const { publicId } = req.params;
@@ -218,7 +206,6 @@ class UploadController {
     }
   }
 
-  // ... you can include proxyFileByUrl, serveFile, and forceDownload similarly if needed
 }
 
 module.exports = UploadController;
