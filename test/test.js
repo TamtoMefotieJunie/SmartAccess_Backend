@@ -22,9 +22,8 @@ describe('GET /tasks', function() {
 
 describe('GET /tasks/:id', function() {
   it('Gets a particular task', function(done) {
-    // You'll need a real ID from your db.json after adding a task
     request(app)
-      .get('/tasks/some-real-id-here') // 👈 Replace with a real ID
+      .get('/tasks/some-real-id-here') 
       .expect(200, done);
   });
 });
@@ -32,7 +31,7 @@ describe('GET /tasks/:id', function() {
 describe('PUT /tasks/:id', function() {
   it('Updates a particular task', function(done) {
     request(app)
-      .put('/tasks/some-real-id-here') // 👈 Replace with a real ID
+      .put('/tasks/some-real-id-here') 
       .send({ title: "Updated task" })
       .expect(200, done);
   });

@@ -2,23 +2,76 @@ const mongoose  = require("mongoose");
 
 const RecommendationSchema = mongoose.Schema(
     {
+        predicted_disease: {
+            type: String,
+        },
+        recommended_specialist: {
+            type: String,
+        },
+        confidence_score: {
+            type: Number,
+            min: 0,
+            max: 1,
+            required: true,
+        },
+        recommended_hospitals: [
+        {
+        hospital_list: {
+          
+            hospital_name: { type: String, required: true },
+            city: { type: String, required: true },
+            region: { type: String, required: true },
+            specialties: [{ type: String }], 
+            website_or_page: String,
+            map_link: String,
+            ownership: String,
+            level: String,
+            longitude:Number,
+            latitude:Number,
+        },
+        
+        matched_specialty_ids: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Specialty',
+                default: [],
+            },
+        ],
+        },
+        ],
+
+        recommendation_case: {
+        type: String,
+        enum: ['new_establishment', 'emergency_analysis'],
+        default: 'emergency_analysis',
+        required: true,
+        },
+
+        timestamp_generated: {
+        type: Date,
+        default: Date.now,
+        },
+
+        status: {
+        type: String,
+        enum: ['Resolved', 'ongoing', 'Failed'],
+        default: 'ongoing',
+        },
+            
+        reasoning_factors: [
+        String,   
+        ],
+
         model_type:{
             type:String,
             ref:'AI_model',
         },
-        recommendation_case:{
-            type:String,
-            enum:['new_establishment','emergency_analysis'],
-        },
-        timestamp_generated: {
-            type: Date,
-            default: Date.now,
-        },
+    
         // for emergencies
         patient_encounter: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Emergency', 
-            required: function() { return this.recommendation_case === 'emergency_analysis'; },
+            
         },
          recommended_hospital: { 
             type: mongoose.Schema.Types.ObjectId,
@@ -34,20 +87,15 @@ const RecommendationSchema = mongoose.Schema(
         recommended_route_distance: { 
             type: Number,
         },
-        status:{
-            enum:['Resolved','ongoing','Failed']
-        },
 
         // for new establishments
         recommended_City: {
             type: String,
-            required: function () {
-                return this.recommendation_case === 'new_establishment';
-            },
+            
         },
         recommended_region: { 
             type: String,
-            required: true,
+            
         },
     
         prediction:{
@@ -57,20 +105,8 @@ const RecommendationSchema = mongoose.Schema(
         desired_specialty:{
             type:String,
             ref:'Speciality',
-            required: function () {
-                return this.recommendation_case === 'new_establishment';
-            },
+            
         },
-
-        confidence_score: {
-            type: Number,
-            min: 0,
-            max: 1, 
-        },
-        reasoning_factors: [{ 
-            type: String, 
-        }],
-
 
     },
     {
