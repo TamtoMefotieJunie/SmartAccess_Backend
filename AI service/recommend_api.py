@@ -125,7 +125,7 @@ def recommend_hospital_for_specialist_final(specialist, top_n=5):
     if filtered_hospitals.empty:
         filtered_hospitals = hospitals_df.copy()
 
-    available_columns = ['hospital_name', 'city', 'region', 'ownership', 'level', 'website_or_page', 'map_link']
+    available_columns = ['hospital_name', 'city', 'region', 'ownership', 'level', 'website_or_page', 'map_link', 'latitude', 'longitude']
     output_columns = [col for col in available_columns if col in filtered_hospitals.columns]
     return filtered_hospitals[output_columns].head(top_n).to_dict(orient='records')
 

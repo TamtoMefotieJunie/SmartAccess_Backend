@@ -50,7 +50,7 @@ app.use('/api/health', healthRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// await initializeHospitalData();
+
 app._router.stack.forEach(layer => {
     if (layer.route) {
         console.log(`${Object.keys(layer.route.methods).join(', ').toUpperCase()} ${layer.route.path}`);

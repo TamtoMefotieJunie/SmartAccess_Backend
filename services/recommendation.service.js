@@ -33,6 +33,10 @@ const getRecommendationsByType = async (recommendation_case) => {
     return await getAllRecommendations({ recommendation_case });
 };
 
+const getRecommendationsByEmergencyId = async (emergencyID) => {
+    return await RecommendationSchema.find({ patient_encounter: emergencyID });
+};
+
 const getRecommendationById = async (id) => {
     if (!id) throw new Error("ID is required");
     return await RecommendationSchema.findById(id).populate([
@@ -50,4 +54,5 @@ module.exports = {
     createRecommendation,
     getRecommendationsByType,
     getRecommendationById,
+    getRecommendationsByEmergencyId,
 };

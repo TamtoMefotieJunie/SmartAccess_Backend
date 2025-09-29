@@ -66,8 +66,7 @@ const RecommendationSchema = mongoose.Schema(
             type:String,
             ref:'AI_model',
         },
-    
-        // for emergencies
+ 
         patient_encounter: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Emergency', 

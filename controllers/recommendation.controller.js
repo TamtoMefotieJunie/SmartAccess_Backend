@@ -283,6 +283,32 @@ const getRecommendationsByType = async (req, res) => {
     }
 };
 
+const getRecommendationsByEmergencyId = async (req, res) => {
+    try {
+        const { emergencyId } = req.params; 
+
+        if (!emergencyId ) {
+            return res.status(400).json({
+                message: "emergency id is required",
+                data: null
+            });
+        }
+        const recommendations = await recommendationService.getRecommendationsByEmergencyId(emergencyId);
+        return res.status(200).json({
+            message: `Recommendations for emergency' ${emergencyId}' fetched successfully`,
+            data: recommendations,
+            count: recommendations.length
+        });
+
+    } catch (error) {
+        console.error("Error in getRecommendationsByEmergencyId controller:", error);
+        return res.status(500).json({
+            message: `Failed to fetch recommendations by emergencyId : ${error.message}`,
+            data: null
+        });
+    }
+};
+
 module.exports = {
     createRecommendation,
     getRecommendationById,
@@ -290,5 +316,6 @@ module.exports = {
     updateRecommendation,
     getAllRecommendations,
     getRecommendationsByType,
-    getRecommendationsByLocation
+    getRecommendationsByLocation,
+    getRecommendationsByEmergencyId,
 };
