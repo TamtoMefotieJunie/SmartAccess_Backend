@@ -297,7 +297,6 @@ const getRecommendationsByEmergencyId = async (req, res) => {
         return res.status(200).json({
             message: `Recommendations for emergency' ${emergencyId}' fetched successfully`,
             data: recommendations,
-            count: recommendations.length
         });
 
     } catch (error) {
