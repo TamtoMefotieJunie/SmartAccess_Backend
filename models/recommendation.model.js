@@ -87,14 +87,12 @@ const RecommendationSchema = mongoose.Schema(
             type: Number,
         },
 
-        // for new establishments
         recommended_City: {
             type: String,
             
         },
         recommended_region: { 
-            type: String,
-            
+            type: String,   
         },
     
         prediction:{
@@ -104,7 +102,6 @@ const RecommendationSchema = mongoose.Schema(
         desired_specialty:{
             type:String,
             ref:'Speciality',
-            
         },
 
     },

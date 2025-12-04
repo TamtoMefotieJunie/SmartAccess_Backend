@@ -9,7 +9,7 @@ const createAppointment = async (req, res) => {
     }
     try{
         const appointment = await appointmentService.createAppointment(appointmentData);
-        res.status(201).json({data:appointment, message: 'User registered successfully' });
+        res.status(201).json({data:appointment, message: 'appointment registered successfully' });
 
     }catch (error) {
         console.log("Error:", error);
@@ -36,7 +36,7 @@ const deleteAppointment = async(req, res) =>{
         if(!appointment){
             return res.status(404).json('appointment does not exist')
         }
-        return res.status(200).json({message: "Hospital deleted successfully", data:appointment})
+        return res.status(200).json({message: "Appointment deleted successfully", data:appointment})
     } catch(error) {
         console.error({mesage:"an error occured while deleting the appointment",error:error.message})
 

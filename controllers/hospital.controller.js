@@ -62,6 +62,19 @@ const getAllHospitals = async (req, res) => {
     }
 }
 
+const getHospitalById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const Hospital = await hospitalservice.getHospitalById(id);
+    if (!Hospital) {
+      return res.status(404).json({ message: 'Hospital not found' });
+    }
+    res.status(200).json(Hospital);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch Hospital' });
+  }
+};
+
 const getOneHospital = async(req,res) => {
     const admin = req.body;
     try {
@@ -103,70 +116,13 @@ const updateHospitals = async (req, res) => {
     }
 }
 
-const addtechnician = async (req, res) => {
-    const { technician, hospital } = req.body;
-
-    try {
-        const dbHospital = await hospitalservice.getHospitalByName(hospital.name);
-        if (!dbHospital) {
-            return res.status(404).json({ message: "Hospital not found" });
-        }
-         const technicianObj = dbHospital.technicians.find(techId => techId.email === technician.email);
-         if (technicianObj) {
-             return res.status(400).json({ message: "Technician already added to this hospital!" });
-         }
-        
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(technician.password, salt);
-
-        const newTech = {
-            ...technician,
-            password: hashedPassword
-        };
-
-        const savedTechnician = await userService.registerUser(newTech);
-
-        dbHospital.technicians.push(savedTechnician._id);
-
-        const savedHospital = await dbHospital.save();
-
-        return res.status(200).json({ data: savedHospital, message: "New technician added successfully!" });
-    } catch (error) {
-        console.error({ message: "An error occurred while saving the new lab tech", error: error.message });
-        return res.status(500).json({ message: "An error occurred", error: error.message });
-    }
-}
-
-const Deletechnician = async (req, res) => {
-    const { id, hospital } = req.body;
-
-        try {
-            const singleHospital = await hospitalservice.getHospitalById(hospital.id);
-            console.log("Before Deletion:", singleHospital.technicians);
-
-           
-            singleHospital.technicians = singleHospital.technicians.filter(tech => tech._id.toString() !== id);
-
-            console.log("After Deletion:", singleHospital.technicians);
-
-            const updatedHospital = await singleHospital.save();
-
-            return res.status(200).json({ message: "Technician removed successfully", data: updatedHospital });
-        } catch (error) {
-            console.error("Error removing technician:", error);
-            return res.status(500).json({ message: "An error occurred while removing the technician", error: error.message });
-        }
-
-};
-
 
 module.exports={
     createHospital,
     getAllHospitals,
     DeleteHospitals,
     updateHospitals,
-    Deletechnician,
-    addtechnician,
+    getHospitalById,
     getOneHospital
     
 }

@@ -214,11 +214,7 @@ class UploadService {
     }
   }
 
-  /**
-   * Validate file before upload
-   * @param {Object} file - File object from multer
-   * @returns {Object} - Validation result
-   */
+ 
   static validateFile(file) {
     const errors = [];
 

@@ -27,7 +27,7 @@ const specialtyRoute = require('./routes/specialty.routes')
 const hospitalSpecialty = require('./routes/hospitalSpec.routes')
 const recommendationRoutes = require('./routes/recommendation.routes')
 const emergencyRoutes = require('./routes/emergencyRequest.routes')
-
+const patientDemographicsRoutes = require('./routes/patientDemographic.routes.js')
 const healthRoutes = require('./routes/health.routes.js');
 const uploadRoutes = require('./routes/upload.routes.js');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
@@ -46,6 +46,8 @@ app.use('/recommend',recommendationRoutes)
 app.use('/emergency',emergencyRoutes)
 app.use('/api/upload', uploadRoutes);
 app.use('/api/health', healthRoutes);
+app.use('/api/demographics', patientDemographicsRoutes);
+
 
 app.use(notFoundHandler);
 app.use(errorHandler);

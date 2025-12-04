@@ -1,9 +1,5 @@
 class HealthController {
-  /**
-   * Health check endpoint
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */
+ 
   static checkHealth(req, res) {
     const healthData = {
       status: 'Server is running',
@@ -21,11 +17,7 @@ class HealthController {
     res.status(200).json(healthData);
   }
 
-  /**
-   * Detailed system information
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */
+ 
   static getSystemInfo(req, res) {
     const systemInfo = {
       node_version: process.version,
@@ -47,11 +39,6 @@ class HealthController {
   }
 }
 
-/**
- * Format uptime in human readable format
- * @param {number} seconds - Uptime in seconds
- * @returns {string} - Formatted uptime
- */
 function formatUptime(seconds) {
   const days = Math.floor(seconds / (24 * 60 * 60));
   const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));

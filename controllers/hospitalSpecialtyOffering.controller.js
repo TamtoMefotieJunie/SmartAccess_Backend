@@ -6,8 +6,8 @@ const axios = require('axios')
 
 const createHospitalSpecialtyOffering = async (req, res) => {
     console.log("hi")
-    const { hospital, speciality, service_name, service_description, service_status, specialists } = req.body;
-    
+    const { hospital, speciality, service_name, service_description, service_status, specialists,availability_time } = req.body;
+    console.log("Request body received:", req.body);
     try {
         const hospitalExists = await hospitalservice.getHospitalById(hospital);
         if (!hospitalExists) {

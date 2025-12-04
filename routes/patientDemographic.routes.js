@@ -1,6 +1,6 @@
 const express = require('express');
 
-const UploadController = require('../controllers/upload.controller.js');
+const PatientDemographicController = require('../controllers/patientDemographics.controller.js');
 const { uploadSingle, handleMulterError } = require('../middleware/upload.js');
 const multer = require('multer');
 
@@ -36,7 +36,7 @@ router.post(
   '/',
   uploadSingle,
   handleMulterError,
-  UploadController.uploadFile
+  PatientDemographicController.uploadFile
 );
 
 
@@ -50,7 +50,7 @@ router.post(
       next();
     });
   },
-  UploadController.uploadMultipleFiles
+  PatientDemographicController.uploadMultipleFiles
 );
 
 

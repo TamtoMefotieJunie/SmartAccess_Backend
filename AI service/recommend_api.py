@@ -1,4 +1,4 @@
-# app.py
+
 from flask import Flask, request, jsonify
 import joblib
 import pandas as pd
@@ -10,15 +10,9 @@ import os
 
 app = Flask(__name__)
 
-# =============================
-# 🧩 LOAD MODELS & MAPPINGS
-# =============================
+MODEL_DIR = "./" 
+CSV_DIR = "./"    
 
-# Paths (adjust if needed)
-MODEL_DIR = "./"  # or "/kaggle/working/" if running in Kaggle
-CSV_DIR = "./"    # where your CSVs are
-
-# Load all 6 models
 model_names = [
     "Logistic_Regression_model.joblib",
     "Decision_Tree_model.joblib",
@@ -33,31 +27,27 @@ for filename in model_names:
     try:
         model = joblib.load(os.path.join(MODEL_DIR, filename))
         models[filename] = model
-        print(f"✅ Loaded {filename}")
+        print(f"Loaded {filename}")
     except Exception as e:
-        print(f"❌ Failed to load {filename}: {e}")
+        print(f" Failed to load {filename}: {e}")
 
 if len(models) == 0:
     raise Exception("NO MODELS LOADED. Check paths and filenames.")
 
-# Load LabelEncoder
 try:
     le = joblib.load(os.path.join(MODEL_DIR, "label_encoder.joblib"))
-    print("✅ LabelEncoder loaded.")
+    print(" LabelEncoder loaded.")
 except Exception as e:
     raise Exception(f"Failed to load LabelEncoder: {e}")
 
-# Load doctor mapping
 doc_data = pd.read_csv(os.path.join(CSV_DIR, "Doctor_Versus_Disease.csv"), encoding='latin1', names=['Disease','Specialist'])
 doc_data['Specialist'] = np.where(doc_data['Disease'] == 'Tuberculosis', 'Pulmonologist', doc_data['Specialist'])
 
-# Load disease description (optional for future)
 des_data = pd.read_csv(os.path.join(CSV_DIR, "Disease_Description.csv"))
 
-# Load hospitals data
 hospitals_df = pd.read_csv(os.path.join(CSV_DIR, "Hospitals data.csv"))
 
-# Clean & parse specialties
+
 def clean_quotes(text):
     if isinstance(text, str):
         return text.replace('‘', "'").replace('’', "'").replace('“', '"').replace('”', '"')
@@ -82,7 +72,6 @@ hospitals_df['specialty_list'] = hospitals_df['specialty_list'].apply(
     lambda lst: [item.strip().lower() for item in lst] if isinstance(lst, list) else []
 )
 
-# Specialist → Hospital keyword mapping
 specialist_to_hospital_keywords = {
     'Allergist': ['allergy'],
     'Cardiologist': ['cardiology', 'hypertension', 'heart_attack', 'vascular_surgery', 'rehabilitation_services'],
@@ -108,7 +97,7 @@ specialist_to_hospital_keywords = {
     'General Physician': ['general_medicine', 'family_medicine', 'internal_medicine'],
 }
 
-# Hospital recommendation function
+
 def recommend_hospital_for_specialist_final(specialist, top_n=5):
     keywords = specialist_to_hospital_keywords.get(specialist, [])
     if not keywords:
@@ -129,31 +118,19 @@ def recommend_hospital_for_specialist_final(specialist, top_n=5):
     output_columns = [col for col in available_columns if col in filtered_hospitals.columns]
     return filtered_hospitals[output_columns].head(top_n).to_dict(orient='records')
 
-# Get column names (symptoms) from training data — IMPORTANT!
-# Since you didn't save the column names, we reconstruct from model input shape
-# But better: save X.columns during training! For now, we infer from one model.
 
-# Let's get feature names from Logistic Regression model (assuming it has feature_names_in_)
 sample_model = next(iter(models.values()))
 if hasattr(sample_model, 'feature_names_in_'):
     ALL_SYMPTOMS = sample_model.feature_names_in_.tolist()
 else:
-    # Fallback: load from your dis_sym_data_v1 columns (you must save this during training!)
-    # For now, we'll assume you have a file or reconstruct — but this is risky.
-    # ⚠️ STRONGLY RECOMMEND saving symptom_columns.pkl during training
-    # Example: joblib.dump(X.columns.tolist(), 'symptom_columns.pkl')
-    # For demo, we'll try to load from CSV if exists, else fail.
-    # Load symptom feature names (the exact columns model was trained on)
+    
     try:
         ALL_SYMPTOMS = joblib.load(os.path.join(MODEL_DIR, "model_features.joblib"))
-        print(f"✅ Loaded {len(ALL_SYMPTOMS)} symptom features from model_features.joblib")
+        print(f"Loaded {len(ALL_SYMPTOMS)} symptom features from model_features.joblib")
     except Exception as e:
         raise Exception(f"Failed to load symptom features. Did you save model_features.joblib during training? Error: {e}")
-    print(f"✅ Model expects {len(ALL_SYMPTOMS)} symptoms.")
+    print(f"Model expects {len(ALL_SYMPTOMS)} symptoms.")
 
-# =============================
-# 🚀 PREDICTION ENDPOINT
-# =============================
 
 @app.route('/recommend', methods=['POST'])
 def recommend():
@@ -166,11 +143,9 @@ def recommend():
         if not isinstance(symptoms_list, list):
             return jsonify({"error": "'symptoms' must be a list of strings"}), 400
 
-        # Create binary feature vector
         test_data = {symptom: 1 if symptom in symptoms_list else 0 for symptom in ALL_SYMPTOMS}
         test_df = pd.DataFrame([test_data])
 
-        # Predict with all 6 models
         predicted_diseases = []
         for model_name, model in models.items():
             try:
@@ -184,29 +159,26 @@ def recommend():
         if len(predicted_diseases) == 0:
             raise Exception("All models failed to predict.")
 
-        # Ensemble: Count votes
         disease_counts = Counter(predicted_diseases)
         total_models = len(models)
         percentage_per_disease = {disease: (count / total_models) * 100 for disease, count in disease_counts.items()}
-        
-        # Get top prediction
+      
         top_disease = max(percentage_per_disease, key=percentage_per_disease.get)
         confidence = percentage_per_disease[top_disease] / 100.0  # 0.0 to 1.0
 
-        # Get specialist
         specialist_row = doc_data[doc_data['Disease'] == top_disease]
         if not specialist_row.empty:
             specialist = specialist_row.iloc[0]['Specialist']
         else:
             specialist = "General Physician"
 
-        # Get raw hospital list
+       
         raw_hospitals = recommend_hospital_for_specialist_final(specialist, top_n=5)
 
-        # ✅ WRAP each hospital inside "hospital_list" to match Node.js schema
+       
         recommended_hospitals = [{"hospital_list": hospital} for hospital in raw_hospitals]
 
-        # Build reasoning
+     
         reasoning_factors = [
             f"Predicted based on {len(symptoms_list)} symptoms: {', '.join(symptoms_list[:5])}{'...' if len(symptoms_list) > 5 else ''}",
             f"Ensemble prediction from {len(predicted_diseases)} models.",
@@ -214,7 +186,7 @@ def recommend():
             f"Recommended specialist: {specialist}."
         ]
 
-        # ✅ RETURN STRUCTURE YOUR NODE.JS BACKEND EXPECTS
+        
         response = {
             "predicted_disease": top_disease,
             "recommended_specialist": specialist,
@@ -222,7 +194,7 @@ def recommend():
             "decision_reason": {
                 "factors": reasoning_factors
             },
-            "recommended_hospitals": recommended_hospitals  # List of dicts
+            "recommended_hospitals": recommended_hospitals  
         }
 
         return jsonify(response)
@@ -235,14 +207,12 @@ def recommend():
             "details": str(e)
         }), 500
 
-# =============================
-# 🧪 OPTIONAL: HEALTH CHECK
-# =============================
+
 
 @app.route('/', methods=['GET'])
 def home():
     return jsonify({
-        "status": "AI Service Running ✅",
+        "status": "AI Service Running ",
         "models_loaded": len(models),
         "symptoms_expected": len(ALL_SYMPTOMS),
         "sample_symptoms": ALL_SYMPTOMS[:5]
